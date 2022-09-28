@@ -1,0 +1,50 @@
+name: Bicep template deployment
+on: workflow_dispatch
+
+env:
+  RESOURCEGROUP_TEMPLATE: 'resourcegroup.bicep'  # bicep templatefile to deploy resourcegroup
+  STORAGE_TEMPLATE: 'storage.bicep'              # bicep templatefile to deploy storage account
+  RESOURCEGROUP_NAME: '_rg-ExpertsLiveDemoGA'    # resource group name for deployment
+  RESOURCEGROUP_TAGS: '{"deployedby":"bicep","demo":"ExpertsLive"}'
+  STORAGEACCOUNT_NAME: 'sademoga220930'          # resource group name for deployment
+
+jobs:
+  build:
+    name: Bicep template deployment
+    runs-on: windows-latest
+    steps:
+    # Action = Checkout: checks-out your repository under $GITHUB_WORKSPACE, so your workflow can access it. 
+    # source: https://github.com/marketplace/actions/checkout
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    # Action = Azure Login: Log on to Azure and authenticate with the AZURE_CREDENTIALS secret
+    # source: https://github.com/marketplace/actions/azure-login
+    - name: Login via Az module
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    # Action = GitHub Action for Azure Resource Manager (ARM) deployment
+    # source: https://github.com/marketplace/actions/deploy-azure-resource-manager-arm-template
+    - name: Deploy ARM Resources with Bicep template
+      uses: azure/arm-deploy@v1
+      with:
+        scope: subscription
+        subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+        region: 'westeurope'
+        template: '${{GITHUB.WORKSPACE}}\bicep\${{env.RESOURCEGROUP_TEMPLATE}}'
+        parameters: resourceGroupName="${{env.RESOURCEGROUP_NAME}}" resourceGroupTags="${{env.RESOURCEGROUP_TAGS}}"
+        deploymentMode: Incremental
+
+    # Action = GitHub Action for Azure Resource Manager (ARM) deployment
+    # source: https://github.com/marketplace/actions/deploy-azure-resource-manager-arm-template
+    - name: Deploy ARM Resources with Bicep template
+      uses: azure/arm-deploy@v1
+      with:
+        scope: resourcegroup
+        resourceGroupName: ${{env.RESOURCEGROUP_NAME}}
+        subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+        template: '${{GITHUB.WORKSPACE}}\bicep\${{env.STORAGE_TEMPLATE}}'
+        parameters: storageaccountName="${{env.STORAGEACCOUNT_NAME}}"
+        deploymentMode: Incremental
