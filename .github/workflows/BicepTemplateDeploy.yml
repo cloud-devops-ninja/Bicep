@@ -5,7 +5,7 @@ env:
   RESOURCEGROUP_TEMPLATE: 'resourcegroup.bicep'  # bicep templatefile to deploy resourcegroup
   STORAGE_TEMPLATE: 'storage.bicep'              # bicep templatefile to deploy storage account
   RESOURCEGROUP_NAME: '_rg-ExpertsLiveDemoGA'    # resource group name for deployment
-  RESOURCEGROUP_TAGS: '{"deployedby":"bicep","demo":"ExpertsLive"}'
+  RESOURCEGROUP_TAGS: '{\"deployedby\":\"bicep\",\"demo\":\"ExpertsLive\"}'
   STORAGEACCOUNT_NAME: 'sademoga220930'          # resource group name for deployment
 
 jobs:
